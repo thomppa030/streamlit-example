@@ -56,7 +56,6 @@ plt.grid(True)
 st.pyplot(plt.gcf())
 
 ### Updated Streamlit App with Multiple Pages:
-```python
 import streamlit as st
 import matplotlib.pyplot as plt
 import numpy as np
