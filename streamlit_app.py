@@ -16,23 +16,42 @@ In the meantime, below is an example of what you can do with just a few lines of
 """
 
 
-with st.echo(code_location='below'):
-    total_points = st.slider("Number of points in spiral", 1, 5000, 2000)
-    num_turns = st.slider("Number of turns in spiral", 1, 100, 9)
+import streamlit as st
+import matplotlib.pyplot as plt
+import numpy as np
 
-    Point = namedtuple('Point', 'x y')
-    data = []
+# Function to calculate movement speed
+def calculate_movement_speed(scale_factor, dexterity_multiplier, dexterity, base_speed):
+    return scale_factor * np.log(dexterity_multiplier * dexterity + 1) + base_speed
 
-    points_per_turn = total_points / num_turns
+# Streamlit app
+st.title('Movement Speed Calculator')
 
-    for curr_point_num in range(total_points):
-        curr_turn, i = divmod(curr_point_num, points_per_turn)
-        angle = (curr_turn + 1) * 2 * math.pi * i / points_per_turn
-        radius = curr_point_num / total_points
-        x = radius * math.cos(angle)
-        y = radius * math.sin(angle)
-        data.append(Point(x, y))
+# Sidebar for input parameters
+st.sidebar.header('Input Parameters')
+scale_factor = st.sidebar.slider('Scale Factor', 0.0, 10.0, 1.0, 0.1)
+dexterity_multiplier = st.sidebar.slider('Dexterity Multiplier', 0.0, 10.0, 1.0, 0.1)
+dexterity = st.sidebar.slider('Dexterity', 1, 100, 10)
+base_speed = st.sidebar.slider('Base Speed', 0, 100, 10)
 
-    st.altair_chart(alt.Chart(pd.DataFrame(data), height=500, width=500)
-        .mark_circle(color='#0068c9', opacity=0.5)
-        .encode(x='x:Q', y='y:Q'))
+# Calculate movement speed
+movement_speed = calculate_movement_speed(scale_factor, dexterity_multiplier, dexterity, base_speed)
+
+# Display movement speed
+st.write(f'Movement Speed: {movement_speed:.2f}')
+
+# Plot graph
+dexterities = np.arange(1, 101, 1)
+movement_speeds = calculate_movement_speed(scale_factor, dexterity_multiplier, dexterities, base_speed)
+
+plt.figure(figsize=(10, 6))
+plt.plot(dexterities, movement_speeds, label='Movement Speed')
+
+plt.xlabel('Dexterity')
+plt.ylabel('Movement Speed')
+plt.title('Movement Speed Based on Dexterity')
+plt.legend()
+plt.grid(True)
+
+st.pyplot(plt.gcf())
+
